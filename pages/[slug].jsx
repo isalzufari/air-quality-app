@@ -1,5 +1,4 @@
 import { useRouter } from "next/router";
-import { NavbarComponent, FooterComponent } from "./components";
 import React, { useState, useEffect } from "react";
 
 import {
@@ -11,9 +10,6 @@ import {
   Badge,
   Table,
 } from "react-bootstrap";
-
-// Css Required
-import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function Post() {
   const router = useRouter();
@@ -117,9 +113,9 @@ export default function Post() {
   const colorAirPollutionLevel = (level) => {
     if (level >= 150) {
       return "danger"
-    } else if (level >= 100) {
+    } else if (level > 50) {
       return "warning"
-    } else if (level >= 50) {
+    } else if (level > 0) {
       return "success"
     }
   }
@@ -134,24 +130,27 @@ export default function Post() {
     return new Date(date).toLocaleDateString("id-ID", options)
   }
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading) return <p className="text-center">Loading...</p>;
   
-  if (isStatus) return <p>Fetch Failed: {errMessage}</p>;
+  if (isStatus) return (
+    <Container className="text-center mt-5">
+      <Badge bg="warning" text="black"><h2>Fetch Failed: {errMessage}</h2></Badge>
+    </Container>
+  );
 
   return (
     <>
-      <NavbarComponent />
-      <Container className="mt-3">
+      <Container className="mt-5">
         <h1>Quality Air near {dataCity.city}, {dataCity.data.country}</h1>
         <p>Air quality index (AQI) and PM2.5 air pollution near, {dataCity.city}</p>
-        <Row className="mt-5">
+        <Row className="mt-3">
           <Col sm={3}>
             <Card>
               <Card.Body>
                 <h3>Cuaca</h3>
                 <p>Cuaca di sekitar {slug}</p>
               
-              <Table striped bordered hover>
+              <Table striped bordered hover responsive>
                 <tbody>
                   {dataCity ? (
                     <>
@@ -211,23 +210,27 @@ export default function Post() {
                     </tr>
                   </thead>
                   <tbody>
-                    
                     <tr>
                       <td>{airPollutionLevel(dataCity.data.current.pollution.aqius)}</td>
                       <td>{dataCity.data.current.pollution.aqius} US AQI</td>
                     </tr>
                   </tbody>
                 </Table>
-                <h3>Health Recomendations</h3>
+                <small>Updated : {showFormattedDate(dataCity.data.current.pollution.ts)}</small>
+                <h3 className="mt-3">Health Recomendations</h3>
                 <p>How to protect from air pollution in {slug}?</p>
                 <Row>
                   <Col>
-                    <p>Wear a mask outdoors</p>
-                    <p>Close your windows to avoid dirty outdoor air</p>
+                    <ul>
+                      <li>Wear a mask outdoors</li>
+                      <li>Close your windows to avoid dirty outdoor air</li>
+                    </ul>
                   </Col>
                   <Col>
-                    <p>Run an air puriffier</p>
-                    <p>Avoid outdoor</p>
+                    <ul>
+                      <li>Run an air puriffier</li>
+                      <li>Avoid outdoor</li>
+                    </ul>
                   </Col>
                 </Row>
               </Card.Body>
@@ -235,18 +238,6 @@ export default function Post() {
           </Col>
         </Row>
       </Container>
-      <FooterComponent />
     </>
   );
 }
-
-// export const getStaticPaths = async (context) => {
-//   const { slug } = context.query;
-//   // If slug is "undefined", since "undefined" cannot be serialized, server will throw error
-//   // But null can be serializable
-//   if (!slug) {
-//     slug = null;
-//   }
-//   // now we are passing the slug to the component
-//   return { props: { slug:slug } };
-// };
