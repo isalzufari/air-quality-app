@@ -27,7 +27,7 @@ export default function Home() {
     if (localStates === null) {
       console.log("Jika data states kosong -> fetch");
       fetch(
-        "http://api.airvisual.com/v2/states?country=Indonesia&key=cb3eb68e-15d1-43e6-9f3d-7f56101373ae"
+        "https://api.airvisual.com/v2/states?country=Indonesia&key=cb3eb68e-15d1-43e6-9f3d-7f56101373ae"
       )
         .then((res) => res.json())
         .then((data) => {
@@ -41,7 +41,7 @@ export default function Home() {
 
     const fetchDataCity = () => {
       fetch(
-        `http://api.airvisual.com/v2/cities?state=${state}&country=Indonesia&key=cb3eb68e-15d1-43e6-9f3d-7f56101373ae`
+        `https://api.airvisual.com/v2/cities?state=${state}&country=Indonesia&key=cb3eb68e-15d1-43e6-9f3d-7f56101373ae`
       )
         .then((res) => res.json())
         .then((data) => {

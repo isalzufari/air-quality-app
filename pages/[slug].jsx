@@ -36,7 +36,7 @@ export default function Post() {
     const fetchData = () => {
       console.log("Fetch ke server dengan limit 10");
       fetch(
-        `http://api.airvisual.com/v2/city?city=${slug}&state=West Java&country=Indonesia&key=cb3eb68e-15d1-43e6-9f3d-7f56101373ae`
+        `https://api.airvisual.com/v2/city?city=${slug}&state=West Java&country=Indonesia&key=cb3eb68e-15d1-43e6-9f3d-7f56101373ae`
       )
         .then((res) => res.json())
         .then((data) => {
