@@ -18,15 +18,16 @@ import {
 
 export default function Post() {
   const router = useRouter();
-  const { slug } = router.query;
+  const { slug, state } = router.query;
+  
+  console.log(state)
 
   const [dataCity, setDataCity] = useState();
   const [isLoading, setLoading] = useState(true);
   const [isStatus, setStatus] = useState(false);
   const [errMessage, setErrMessage] = useState();
-  // const { slug } = props;
-  // console.log(props.slug);
-
+  const [dataCityAsc, setDataCityAsc] = useState();
+  
   useEffect(() => {
     if (!router.isReady) return;
 
@@ -36,7 +37,7 @@ export default function Post() {
     const fetchData = () => {
       console.log("Fetch ke server dengan limit 10");
       fetch(
-        `https://api.airvisual.com/v2/city?city=${slug}&state=West Java&country=Indonesia&key=cb3eb68e-15d1-43e6-9f3d-7f56101373ae`
+        `https://api.airvisual.com/v2/city?city=${slug}&state=${state}&country=Indonesia&key=cb3eb68e-15d1-43e6-9f3d-7f56101373ae`
       )
         .then((res) => res.json())
         .then((data) => {
@@ -101,7 +102,22 @@ export default function Post() {
         fetchData();
       }
     }
+
+    setDataCityAsc(localStates.sort((a, b) => Number(a.data.current.pollution.aqius) - Number(b.data.current.pollution.aqius)))
+
+    // const sortDataCityAscending = sortDataCityAscending.reverse()
+    
+    // sortDataCityAscending.forEach(e => {
+    //   console.log(e.data.current.pollution.aqius)
+    // });
+    
+    // sortDataCityDescending.forEach(e => {
+    //   console.log(e.data.current.pollution.aqius)
+    // });
+
   }, [router.isReady]);
+
+  console.log(dataCityAsc);
 
   if (isLoading) return <p className="text-center">Loading...</p>;
 
@@ -127,8 +143,8 @@ export default function Post() {
           <Col sm={3}>
             <Card>
               <Card.Body>
-                <h3>Cuaca</h3>
-                <p>Cuaca di sekitar {slug}</p>
+                <h3>Weather</h3>
+                <p>Wather around {slug}</p>
 
                 <Table striped bordered hover responsive>
                   <tbody>
@@ -164,6 +180,45 @@ export default function Post() {
                 </small>
               </Card.Body>
             </Card>
+
+            <Card className="mt-3">
+              <Card.Body>
+                <h5>City cleanest in Indonesia</h5>
+                <Table striped bordered hover responsive>
+                  <thead>
+                    <tr>
+                      <th>City</th>
+                      <th>Pollution</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {
+                      dataCityAsc.map((city, index) => (
+                        <tr key={index}>
+                          <td>{city.city}</td>
+                          <td>{city.data.current.pollution.aqius}</td>
+                        </tr>
+                      ))
+                    }
+                    {/* <tr
+                      className={
+                        "bg-" +
+                        colorAirPollutionLevel(
+                          dataCity.data.current.pollution.aqius
+                        )
+                      }
+                    >
+                      <td>
+                        {airPollutionLevel(
+                          dataCity.data.current.pollution.aqius
+                        )}
+                      </td>
+                      <td>{dataCity.data.current.pollution.aqius} US AQI</td>
+                    </tr> */}
+                  </tbody>
+                </Table>
+              </Card.Body>
+            </Card>
           </Col>
           <Col>
             <Card>
@@ -186,7 +241,9 @@ export default function Post() {
                   </Col>
                   <Col>
                     <p>LIVE AQI INDEX</p>
-                    <h2>Unhealthy</h2>
+                    <h2>
+                      {airPollutionLevel(dataCity.data.current.pollution.aqius)}
+                    </h2>
                   </Col>
                 </Row>
               </Alert>
@@ -201,7 +258,14 @@ export default function Post() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
+                    <tr
+                      className={
+                        "bg-" +
+                        colorAirPollutionLevel(
+                          dataCity.data.current.pollution.aqius
+                        )
+                      }
+                    >
                       <td>
                         {airPollutionLevel(
                           dataCity.data.current.pollution.aqius

@@ -101,6 +101,8 @@ export default function Home() {
     }
   }, [state]);
 
+  console.log(dataCity);
+
   if (isLoading) return <p className="text-center">Loading...</p>;
 
   return (
@@ -155,7 +157,7 @@ export default function Home() {
             <Col>
               <Card>
                 <Card.Body>
-                  <h3>Provinsi di Indonesia</h3>
+                  <h3>State in Indonesia</h3>
                   <Table striped bordered hover>
                     <thead>
                       <tr>
@@ -188,7 +190,7 @@ export default function Home() {
             <Col>
               <Card>
                 <Card.Body>
-                  <h3>Kota di Provinsi {state}</h3>
+                  <h3>City in State {state}</h3>
                   <Table striped bordered hover>
                     <thead>
                       <tr>
@@ -198,7 +200,7 @@ export default function Home() {
                     </thead>
                     <tbody>
                       {dataCity.data.map((city, index) => (
-                        <Link href={`/${city.city}`} key={index}>
+                        <Link href={`/${city.city}?state=${dataCity.state}`} key={index}>
                           <tr style={{ cursor: "pointer" }}>
                             <td>{index + 1}</td>
                             <td>{city.city}</td>
