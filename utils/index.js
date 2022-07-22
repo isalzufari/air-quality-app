@@ -1,9 +1,9 @@
 const airPollutionLevel = (level) => {
   if (level >= 150) {
     return "Unhealthy";
-  } else if (level >= 100) {
+  } else if (level > 50) {
     return "Unhealthy For Sensitive Groups";
-  } else if (level >= 50) {
+  } else if (level > 0) {
     return "Good";
   }
 };
