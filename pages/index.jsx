@@ -1,5 +1,3 @@
-import { NavbarComponent } from "./components/Navbar";
-import { FooterComponent } from "./components/Footer";
 import {
   Container,
   Row,
@@ -13,18 +11,16 @@ import {
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 
-// Css Required
-import "bootstrap/dist/css/bootstrap.min.css";
-
 export default function Home() {
   const [state, setState] = useState("West Java");
   const [dataCity, setDataCity] = useState();
   const [dataStates, setDataStates] = useState({});
 
   const [isLoading, setLoading] = useState(true);
-  const [isStatus, setStatus] = useState('');
+  const [isStatus, setStatus] = useState("");
 
   useEffect(() => {
+    // Get Data from LocaStorage
     const localStates = JSON.parse(localStorage.getItem("states"));
     const localCity = JSON.parse(localStorage.getItem("cityStates"));
 
@@ -75,7 +71,7 @@ export default function Home() {
             };
 
             setDataCity(stateDataCity);
-            setStatus('')
+            setStatus("");
             setLoading(false);
           } else if (data.status === "fail") {
             setStatus(data.data.message);
@@ -86,36 +82,34 @@ export default function Home() {
     };
 
     if (localCity === null) {
-      console.log("Localstorage state masih belum ada")
+      console.log("Localstorage state masih belum ada");
       fetchDataCity();
     } else {
-      console.log("Localstorage state sudah ada")
-      const searchCityInLocalStorage = localCity.find(local => local.state === state);
+      console.log("Localstorage state sudah ada");
+      const searchCityInLocalStorage = localCity.find(
+        (local) => local.state === state
+      );
       if (searchCityInLocalStorage) {
-        console.log("Di Local sudah ada")
+        console.log("Di Local sudah ada");
         setDataCity(searchCityInLocalStorage);
         setLoading(false);
-        setStatus('')
+        setStatus("");
       } else {
-        console.log("Di local storage belum ada fetch server")
+        console.log("Di local storage belum ada fetch server");
         fetchDataCity();
       }
     }
-
   }, [state]);
 
-  console.log(isStatus);
-
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading) return <p className="text-center">Loading...</p>;
 
   return (
     <>
-      <NavbarComponent />
       <Container>
-        <main className="py-3">
+        <main className="mt-5">
           <h1>Air Quality in Indonesia</h1>
           <p>Air quality index (AQI) and PM2.5 air pollution in Jakarta</p>
-          <Card>
+          <Card className="shadow-sm">
             <Card.Body>
               <h3>Overview</h3>
               <p>How polluted is Indonesia?</p>
@@ -203,24 +197,28 @@ export default function Home() {
                       </tr>
                     </thead>
                     <tbody>
-                        {dataCity.data.map((city, index) => (
-                          <Link href={`/${city.city}`} key={index}>
-                            <tr style={{ cursor: "pointer" }}>
-                              <td>{index + 1}</td>
-                              <td>{city.city}</td>
-                            </tr>
-                          </Link>
-                        ))}
+                      {dataCity.data.map((city, index) => (
+                        <Link href={`/${city.city}`} key={index}>
+                          <tr style={{ cursor: "pointer" }}>
+                            <td>{index + 1}</td>
+                            <td>{city.city}</td>
+                          </tr>
+                        </Link>
+                      ))}
                     </tbody>
                   </Table>
-                  {isStatus}
+                  <Badge
+                    bg={isStatus ? "warning" : "success"}
+                    text={isStatus ? "black" : "white"}
+                  >
+                    Info : {isStatus ? `Error: ${isStatus}` : "Sukses"}
+                  </Badge>
                 </Card.Body>
               </Card>
             </Col>
           </Row>
         </main>
       </Container>
-      <FooterComponent />
     </>
   );
 }
