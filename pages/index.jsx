@@ -11,10 +11,12 @@ import {
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 
+import { fetchDataStates, fetchDataCityFromServer } from "../utils/fetch";
+
 export default function Home() {
-  const [state, setState] = useState("West Java");
+  const [state, setState] = useState("Jakarta");
   const [dataCity, setDataCity] = useState();
-  const [dataStates, setDataStates] = useState({});
+  const [dataStates, setDataStates] = useState();
 
   const [isLoading, setLoading] = useState(true);
   const [isStatus, setStatus] = useState("");
@@ -23,74 +25,66 @@ export default function Home() {
     // Get Data from LocaStorage
     const localStates = JSON.parse(localStorage.getItem("states"));
     const localCity = JSON.parse(localStorage.getItem("cityStates"));
-
+    
     if (localStates === null) {
-      console.log("Jika data states kosong -> fetch");
-      fetch(
-        "https://api.airvisual.com/v2/states?country=Indonesia&key=cb3eb68e-15d1-43e6-9f3d-7f56101373ae"
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          localStorage.setItem("states", JSON.stringify(data));
-          setDataStates(data);
-        });
+      console.log("LocalStorage[states] null -> fetch server");
+      fetchDataStates().then((data) => {
+        localStorage.setItem("states", JSON.stringify(data));
+        setDataStates(data);
+      });
     } else {
-      console.log("Data states sudah ada -> localstorage");
+      console.log("LocalStorage[states] -> localstorage");
       setDataStates(localStates);
     }
 
     const fetchDataCity = () => {
-      fetch(
-        `https://api.airvisual.com/v2/cities?state=${state}&country=Indonesia&key=cb3eb68e-15d1-43e6-9f3d-7f56101373ae`
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.status === "success") {
-            if (localCity === null) {
-              const localDataCity = [
-                {
-                  state: state,
-                  data: data.data,
-                },
-              ];
-              localStorage.setItem("cityStates", JSON.stringify(localDataCity));
-            } else {
-              const localDataCity = [
-                ...localCity,
-                {
-                  state: state,
-                  data: data.data,
-                },
-              ];
-              localStorage.setItem("cityStates", JSON.stringify(localDataCity));
-            }
-
-            const stateDataCity = {
-              state: state,
-              data: data.data,
-            };
-
-            setDataCity(stateDataCity);
-            setStatus("");
-            setLoading(false);
-          } else if (data.status === "fail") {
-            setStatus(data.data.message);
+      fetchDataCityFromServer(state).then((data) => {
+        if (data.status === "success") {
+          if (localCity === null) {
+            const localDataCity = [
+              {
+                state: state,
+                data: data.data,
+              },
+            ];
+            localStorage.setItem("cityStates", JSON.stringify(localDataCity));
           } else {
-            setStatus(data.data.message);
+            const localDataCity = [
+              ...localCity,
+              {
+                state: state,
+                data: data.data,
+              },
+            ];
+            localStorage.setItem("cityStates", JSON.stringify(localDataCity));
           }
-        });
+
+          const stateDataCity = {
+            state: state,
+            data: data.data,
+          };
+
+          setDataCity(stateDataCity);
+          setStatus("");
+          setLoading(false);
+        } else if (data.status === "fail") {
+          setStatus(data.data.message);
+        } else {
+          setStatus(data.data.message);
+        }
+      });
     };
 
     if (localCity === null) {
-      console.log("Localstorage state masih belum ada");
+      console.log("LocalStorage[cityStates] null -> fetch server");
       fetchDataCity();
     } else {
-      console.log("Localstorage state sudah ada");
+      console.log("LocalStorage[cityStates] -> localstorage -> Find city in LocalStorage");
       const searchCityInLocalStorage = localCity.find(
         (local) => local.state === state
       );
       if (searchCityInLocalStorage) {
-        console.log("Di Local sudah ada");
+        console.log("Find city in LocalStorage");
         setDataCity(searchCityInLocalStorage);
         setLoading(false);
         setStatus("");
@@ -100,8 +94,6 @@ export default function Home() {
       }
     }
   }, [state]);
-
-  console.log(dataCity);
 
   if (isLoading) return <p className="text-center">Loading...</p>;
 
@@ -200,7 +192,10 @@ export default function Home() {
                     </thead>
                     <tbody>
                       {dataCity.data.map((city, index) => (
-                        <Link href={`/${city.city}?state=${dataCity.state}`} key={index}>
+                        <Link
+                          href={`/${city.city}?state=${dataCity.state}`}
+                          key={index}
+                        >
                           <tr style={{ cursor: "pointer" }}>
                             <td>{index + 1}</td>
                             <td>{city.city}</td>

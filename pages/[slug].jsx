@@ -20,8 +20,6 @@ export default function Post() {
   const router = useRouter();
   const { slug, state } = router.query;
   
-  console.log(state)
-
   const [dataCity, setDataCity] = useState();
   const [isLoading, setLoading] = useState(true);
   const [isStatus, setStatus] = useState(false);
@@ -101,9 +99,9 @@ export default function Post() {
         console.log("Di local storage belum ada fetch server");
         fetchData();
       }
+      setDataCityAsc(localStates.sort((a, b) => Number(a.data.current.pollution.aqius) - Number(b.data.current.pollution.aqius)))
     }
 
-    setDataCityAsc(localStates.sort((a, b) => Number(a.data.current.pollution.aqius) - Number(b.data.current.pollution.aqius)))
 
     // const sortDataCityAscending = sortDataCityAscending.reverse()
     
@@ -117,7 +115,7 @@ export default function Post() {
 
   }, [router.isReady]);
 
-  console.log(dataCityAsc);
+  // console.log(dataCityAsc);
 
   if (isLoading) return <p className="text-center">Loading...</p>;
 
@@ -193,12 +191,15 @@ export default function Post() {
                   </thead>
                   <tbody>
                     {
+                      dataCityAsc ? 
                       dataCityAsc.map((city, index) => (
                         <tr key={index}>
                           <td>{city.city}</td>
                           <td>{city.data.current.pollution.aqius}</td>
                         </tr>
-                      ))
+                      )) : <tr>
+                        <td colSpan={2}>Data Kosong</td>
+                      </tr>
                     }
                     {/* <tr
                       className={
