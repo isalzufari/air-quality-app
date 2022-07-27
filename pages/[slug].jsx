@@ -19,13 +19,13 @@ import {
 export default function Post() {
   const router = useRouter();
   const { slug, state } = router.query;
-  
+
   const [dataCity, setDataCity] = useState();
   const [isLoading, setLoading] = useState(true);
   const [isStatus, setStatus] = useState(false);
   const [errMessage, setErrMessage] = useState();
   const [dataCityAsc, setDataCityAsc] = useState();
-  
+
   useEffect(() => {
     if (!router.isReady) return;
 
@@ -99,20 +99,24 @@ export default function Post() {
         console.log("Di local storage belum ada fetch server");
         fetchData();
       }
-      setDataCityAsc(localStates.sort((a, b) => Number(a.data.current.pollution.aqius) - Number(b.data.current.pollution.aqius)))
+      setDataCityAsc(
+        localStates.sort(
+          (a, b) =>
+            Number(a.data.current.pollution.aqius) -
+            Number(b.data.current.pollution.aqius)
+        )
+      );
     }
 
-
     // const sortDataCityAscending = sortDataCityAscending.reverse()
-    
+
     // sortDataCityAscending.forEach(e => {
     //   console.log(e.data.current.pollution.aqius)
     // });
-    
+
     // sortDataCityDescending.forEach(e => {
     //   console.log(e.data.current.pollution.aqius)
     // });
-
   }, [router.isReady]);
 
   // console.log(dataCityAsc);
@@ -190,17 +194,18 @@ export default function Post() {
                     </tr>
                   </thead>
                   <tbody>
-                    {
-                      dataCityAsc ? 
+                    {dataCityAsc ? (
                       dataCityAsc.map((city, index) => (
                         <tr key={index}>
                           <td>{city.city}</td>
                           <td>{city.data.current.pollution.aqius}</td>
                         </tr>
-                      )) : <tr>
+                      ))
+                    ) : (
+                      <tr>
                         <td colSpan={2}>Data Kosong</td>
                       </tr>
-                    }
+                    )}
                     {/* <tr
                       className={
                         "bg-" +
